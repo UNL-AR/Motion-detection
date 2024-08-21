@@ -4,7 +4,7 @@ using UnityEngine.XR;
 using UnityEngine.XR.Interaction.Toolkit;
 using TMPro;
 
-public class InputDisplay : MonoBehaviour
+public class DisplayInputData : MonoBehaviour
 {
     public XRController leftController;
     public XRController rightController;

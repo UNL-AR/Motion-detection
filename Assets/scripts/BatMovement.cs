@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.XR;
 
-public class SyncBatMovement : MonoBehaviour
+public class BatMovement : MonoBehaviour
 {
     public XRNode controllerNode = XRNode.RightHand; // Using the right controller
     private Vector3 controllerPosition;

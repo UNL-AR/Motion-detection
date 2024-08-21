@@ -13,54 +13,43 @@ public class MotionRecorder : MonoBehaviour
     private List<Quaternion> recordedRotations = new List<Quaternion>();
 
     private bool isRecording = false;
-
-    private float recordDuration = 3.0f; // Record for 3 seconds
+    private float recordDuration = 5.0f; // Record for X seconds
 
     void Start()
     {
         Debug.Log("Script started.");
-        device = InputDevices.GetDeviceAtXRNode(controllerNode);
-
-        if (device.isValid)
-        {
-            Debug.Log("Device detected: " + device.name);
-        }
-        else
-        {
-            Debug.LogError("No valid device found. Ensure your controller is connected and recognized.");
-        }
     }
 
     void Update()
     {
-        // Check if the right controller is detected
+        // Check if device is valid
         if (!device.isValid)
         {
             device = InputDevices.GetDeviceAtXRNode(controllerNode);
-        }
 
-        // Check if 'A' button is pressed to start recording
-        if (device.isValid)
-        {
-            if (device.TryGetFeatureValue(CommonUsages.primaryButton, out bool isAPressed))
-            {
-                if (isAPressed && !isRecording)
-                {
-                    Debug.Log("'A' button pressed. Starting recording...");
-                    StartCoroutine(RecordMotion());
-                }
+            if (device.isValid)
+            {   
+                //Print out device name
+                Debug.Log("Device detected: " + device.name);
             }
             else
             {
-                Debug.LogWarning("Failed to read the 'A' button state.");
+                Debug.LogWarning("Device not yet detected, continuing to check...");
+                return; // Skip the rest of Update until the device is valid
             }
+        }
+
+        // Check if 'A' button is pressed to start recording
+        if (device.TryGetFeatureValue(CommonUsages.primaryButton, out bool isAPressed) && isAPressed && !isRecording)
+        {
+            Debug.Log("'A' button pressed. Starting recording...");
+            StartCoroutine(RecordMotion());
         }
     }
 
-
-
     IEnumerator RecordMotion()
     {
+        // change initial false to true
         isRecording = true;
 
         recordedPositions.Clear();
@@ -76,23 +65,27 @@ public class MotionRecorder : MonoBehaviour
                 recordedPositions.Add(position);
                 recordedRotations.Add(rotation);
             }
+            else
+            {
+                Debug.LogWarning("Failed to retrieve position or rotation.");
+            }
 
             timer += Time.deltaTime;
             yield return null;
         }
 
+        // flip recrding boolean to false after recording is done.
         isRecording = false;
         Debug.Log("Recording completed. Saving motion data...");
-
         SaveMotionData();
     }
 
     void SaveMotionData()
     {
+        string path = Application.dataPath + "/motion_data.txt";
+
         try
         {
-            string path = Application.dataPath + "/motion_data.txt";
-
             using (StreamWriter writer = new StreamWriter(path))
             {
                 writer.WriteLine("PositionX,PositionY,PositionZ,RotationX,RotationY,RotationZ,RotationW");
