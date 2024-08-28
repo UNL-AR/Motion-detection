@@ -21,6 +21,7 @@ public class BatMovement : MonoBehaviour
 
         // Define the rotation offset (60 degrees around the X axis)
         rotationOffset = Quaternion.Euler(60, -10, 0);
+        
     }
 
     void Update()
